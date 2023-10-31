@@ -1,6 +1,8 @@
-# College
-TY_Sem_2023
-These are My Semesters Assigments which I have Done in my 5th Semester 
+This Repository Has All of My Assignments for Subjects of Third Year First Semester 
+- Computer Netwroks
+- Cyber Security
+- Artificial Intelligence 
+
 
 # Tech Stack
 - Java
