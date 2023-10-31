@@ -1,0 +1,1 @@
+This is Example.txt which will be sent to client by server and client will read it and create received.txt file based on that 
