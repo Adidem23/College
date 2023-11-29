@@ -1,0 +1,122 @@
+import java.util.*;
+
+class State {
+    int jugA;
+    int jugB;
+
+    public State(int jugA, int jugB) {
+        this.jugA = jugA;
+        this.jugB = jugB;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        State state = (State) obj;
+        return jugA == state.jugA && jugB == state.jugB;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(jugA, jugB);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + jugA + ", " + jugB + ")";
+    }
+}
+
+public class Water_Jug_Problem {
+    public static List<String> solveWaterJugProblem(int capacityA, int capacityB, int target) {
+        List<String> solutionSteps = new ArrayList<>();
+        Set<State> visited = new HashSet<>();
+        Queue<State> queue = new LinkedList<>();
+
+        // Initialize the queue with the initial state (0 gallons in both jugs)
+        queue.offer(new State(0, 0));
+        solutionSteps.add("Initial State: (0, 0)");
+
+        // Breadth-first search
+        while (!queue.isEmpty()) {
+            State currentState = queue.poll();
+
+            // Check if the target amount is achieved
+            if (currentState.jugA == target || currentState.jugB == target) {
+                return solutionSteps;
+            }
+
+            visited.add(currentState);
+
+            // Define possible actions: fill jug A, fill jug B, empty jug A, empty jug B, pour from A to B, pour from B to A
+            int[][] actions = {
+                    {capacityA, currentState.jugB},      // Fill jug A
+                    {currentState.jugA, capacityB},      // Fill jug B
+                    {0, currentState.jugB},              // Empty jug A
+                    {currentState.jugA, 0},              // Empty jug B
+                    {Math.min(currentState.jugA + currentState.jugB, capacityA),
+                            Math.max(0, currentState.jugA + currentState.jugB - capacityA)},   // Pour from B to A
+                    {Math.max(0, currentState.jugA + currentState.jugB - capacityB),
+                            Math.min(currentState.jugA + currentState.jugB, capacityB)}        // Pour from A to B
+            };
+
+            // Apply actions and add new states to the queue
+            for (int[] action : actions) {
+                State newState = new State(action[0], action[1]);
+                if (!visited.contains(newState)) {
+                    queue.offer(newState);
+                    solutionSteps.add(getActionDescription(currentState, newState, capacityA, capacityB));
+                }
+            }
+        }
+
+        return Collections.emptyList(); // Solution not found
+    }
+
+    private static String getActionDescription(State currentState, State newState, int capacityA, int capacityB) {
+        if (newState.jugA == currentState.jugA) {
+            int filled = newState.jugB - currentState.jugB;
+            return "Fill Jug B: " + filled + " gallons";
+        } else if (newState.jugB == currentState.jugB) {
+            int filled = newState.jugA - currentState.jugA;
+            return "Fill Jug A: " + filled + " gallons";
+        } else if (newState.jugA == 0) {
+            int thrownOut = currentState.jugA;
+            return "Empty Jug A: " + thrownOut + " gallons thrown out";
+        } else if (newState.jugB == 0) {
+            int thrownOut = currentState.jugB;
+            return "Empty Jug B: " + thrownOut + " gallons thrown out";
+        } else if (newState.jugA + currentState.jugB <= currentState.jugA) {
+            int poured = currentState.jugA - newState.jugA;
+            return "Pour from B to A: " + poured + " gallons poured in";
+        } else {
+            int poured = currentState.jugB - newState.jugB;
+            return "Pour from A to B: " + poured + " gallons poured in";
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the capacity of Jug A: ");
+        int capacityA = scanner.nextInt();
+
+        System.out.print("Enter the capacity of Jug B: ");
+        int capacityB = scanner.nextInt();
+
+        System.out.print("Enter the target amount: ");
+        int target = scanner.nextInt();
+
+        List<String> result = solveWaterJugProblem(capacityA, capacityB, target);
+
+        if (result.isEmpty()) {
+            System.out.println("Solution not found.");
+        } else {
+            System.out.println("Solution steps:");
+            for (String step : result) {
+                System.out.println(step);
+            }
+        }
+    }
+}
